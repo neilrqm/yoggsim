@@ -1,0 +1,595 @@
+﻿
+MindControl
+Take control of an enemy minion.
+
+InnerRage
+Deal 1 damage to a minion and give it +2 Attack.
+
+BaneofDoom
+Deal 2 damage to a character. If that kills it, summon a random Demon.
+
+Thoughtsteal
+Copy 2 cards from your opponent's deck and put them into your hand.
+
+Windfury
+Give a minion Windfury.
+
+Swipe
+Deal 4 damage to an enemy and 1 damage to all other enemies.
+
+BlessingofMight
+Give a minion +3 Attack.
+
+Brawl
+Destroy all minions except one. (chosen randomly)
+
+Polymorph
+Transform a minion into a 1/1 Sheep.
+
+Starfall
+Choose One - Deal 5 damage to a minion; or 2 damage to all enemy minions.
+
+Nourish
+Choose One - Gain 2 Mana Crystals; or Draw 3 cards.
+
+Counterspell
+Secret: When your opponent casts a spell, Counter it.
+
+Redemption
+Secret: When one of your minions dies, return it to life with 1 Health.
+
+HuntersMark
+Change a minion's Health to 1.
+
+Mindgames
+Put a copy of a random minion from your opponent's deck into the battlefield.
+
+Shadowflame
+Destroy a friendly minion and deal its Attack damage to all enemy minions.
+
+AncestralHealing
+Restore a minion to full Health and give it Taunt.
+
+MarkofNature
+Choose One - Give a minion +4 Attack; or +4 Health and Taunt.
+
+SacrificialPact
+Destroy a Demon. Restore #5 Health to your hero.
+
+IceLance
+Freeze a character. If it was already Frozen, deal 4 damage instead.
+
+Backstab
+Deal 2 damage to an undamaged minion.
+
+IceBlock
+Secret: When your hero takes fatal damage, prevent it and become Immune this turn.
+
+MirrorEntity
+Secret: When your opponent plays a minion, summon a copy of it.
+
+Vanish
+Return all minions to their owner's hand.
+
+MarkoftheWild
+Give a minion Taunt and +2/+2. (+2 Attack/+2 Health)
+
+ShadowMadness
+Gain control of an enemy minion with 3 or less Attack until end of turn.
+
+Repentance
+Secret: When your opponent plays a minion, reduce its Health to 1.
+
+Naturalize
+Destroy a minion. Your opponent draws 2 cards.
+
+FeralSpirit
+Summon two 2/3 Spirit Wolves with Taunt. Overload: (2)
+
+RockbiterWeapon
+Give a friendly character +3 Attack this turn.
+
+HammerofWrath
+Deal 3 damage. Draw a card.
+
+Innervate
+Gain 2 Mana Crystals this turn only.
+
+ColdBlood
+Give a minion +2 Attack. Combo: +4 Attack instead.
+
+HolySmite
+Deal 2 damage.
+
+Betrayal
+An enemy minion deals its damage to the minions next to it.
+
+Vaporize
+Secret: When a minion attacks your hero, destroy it.
+
+HolyLight
+Restore #6 Health.
+
+MultiShot
+Deal 3 damage to two random enemy minions.
+
+KillCommand
+Deal 3 damage. If you have a Beast, deal 5 damage instead.
+
+ForkedLightning
+Deal 2 damage to 2 random enemy minions. Overload: (2)
+
+Fireball
+Deal 6 damage.
+
+Charge
+Give a friendly minion +2 Attack and Charge.
+
+Assassinate
+Destroy an enemy minion.
+
+Shadowstep
+Return a friendly minion to your hand. It costs (2) less.
+
+Spellbender
+Secret: When an enemy casts a spell on a minion, summon a 1/3 as the new target.
+
+InnerFire
+Change a minion's Attack to be equal to its Health.
+
+SouloftheForest
+Give your minions "Deathrattle: Summon a 2/2 Treant."
+
+ExplosiveShot
+Deal 5 damage to a minion and 2 damage to adjacent ones.
+
+BattleRage
+Draw a card for each damaged friendly character.
+
+AncestralSpirit
+Choose a minion. When that minion is destroyed, return it to the battlefield.
+
+ConeofCold
+Freeze a minion and the minions next to it, and deal 1 damage to them.
+
+HolyWrath
+Draw a card and deal damage equal to its cost.
+
+AnimalCompanion
+Summon a random Beast Companion.
+
+ArcaneExplosion
+Deal 1 damage to all enemy minions.
+
+SnakeTrap
+Secret: When one of your minions is attacked, summon three 1/1 Snakes.
+
+Blizzard
+Deal 2 damage to all enemy minions and Freeze them.
+
+DeadlyPoison
+Give your weapon +2 Attack.
+
+Sap
+Return an enemy minion to its owner's hand.
+
+EyeforanEye
+Secret: When your hero takes damage, deal that much damage to the enemy hero.
+
+Moonfire
+Deal 1 damage.
+
+Consecration
+Deal 2 damage to all enemies.
+
+Savagery
+Deal damage equal to your hero's Attack to a minion.
+
+ForceofNature
+Summon three 2/2 Treants with Charge that die at the end of the turn.
+
+PoweroftheWild
+Choose One - Give your minions +1/+1; or Summon a 3/2 Panther.
+
+LightningBolt
+Deal 3 damage. Overload: (1)
+
+Upgrade
+If you have a weapon, give it +1/+1. Otherwise equip a 1/3 weapon.
+
+FreezingTrap
+Secret: When an enemy minion attacks, return it to its owner's hand and it costs (2) more.
+
+MindBlast
+Deal 5 damage to the enemy hero.
+
+ShieldSlam
+Deal 1 damage to a minion for each Armor you have.
+
+ArcaneIntellect
+Draw 2 cards.
+
+ArcaneMissiles
+Deal 3 damage randomly split among enemy characters.
+
+Shiv
+Deal 1 damage. Draw a card.
+
+Bite
+Give your hero +4 Attack this turn and 4 Armor.
+
+NobleSacrifice
+Secret: When an enemy attacks, summon a 2/1 Defender as the new target.
+
+ExplosiveTrap
+Secret: When your hero is attacked, deal 2 damage to all enemies.
+
+FrostNova
+Freeze all enemy minions.
+
+LayonHands
+Restore #8 Health. Draw 3 cards.
+
+PowerWordShield
+Give a minion +2 Health. Draw a card.
+
+IceBarrier
+Secret: As soon as your hero is attacked, gain 8 Armor.
+
+LightningStorm
+Deal 2-3 damage to all enemy minions. Overload: (2)
+
+Sprint
+Draw 4 cards.
+
+Whirlwind
+Deal 1 damage to ALL minions.
+
+Frostbolt
+Deal 3 damage to a character and Freeze it.
+
+FanofKnives
+Deal 1 damage to all enemy minions. Draw a card.
+
+DivineFavor
+Draw cards until you have as many in hand as your opponent.
+
+Headcrack
+Deal 2 damage to the enemy hero. Combo: Return this to your hand next turn.
+
+SinisterStrike
+Deal 3 damage to the enemy hero.
+
+HandofProtection
+Give a minion Divine Shield.
+
+SavageRoar
+Give your characters +2 Attack this turn.
+
+Equality
+Change the Health of ALL minions to 1.
+
+Hex
+Transform a minion into a 0/1 Frog with Taunt.
+
+EarthShock
+Silence a minion, then deal 1 damage to it.
+
+HealingTouch
+Restore #8 Health.
+
+Execute
+Destroy a damaged enemy minion.
+
+MortalStrike
+Deal 4 damage. If your hero has 12 or less Health, deal 6 damage instead.
+
+Snipe
+Secret: When your opponent plays a minion, deal 4 damage to it.
+
+FarSight
+Draw a card. That card costs (3) less.
+
+Starfire
+Deal 5 damage. Draw a card.
+
+TotemicMight
+Give your Totems +2 Health.
+
+Wrath
+Choose One - Deal 3 damage to a minion; or 1 damage and draw a card.
+
+HolyNova
+Deal 2 damage to all enemies. Restore #2 Health to all friendly characters.
+
+PowerOverwhelming
+Give a friendly minion +4/+4 until end of turn. Then, it dies. Horribly.
+
+Humility
+Change a minion's Attack to 1.
+
+TwistingNether
+Destroy all minions.
+
+SenseDemons
+Put 2 random Demons from your deck into your hand.
+
+LavaBurst
+Deal 5 damage. Overload: (2)
+
+ArcaneShot
+Deal 2 damage.
+
+Flare
+All minions lose Stealth. Destroy all enemy Secrets. Draw a card.
+
+BestialWrath
+Give a Beast +2 Attack and Immune this turn.
+
+Eviscerate
+Deal 2 damage. Combo: Deal 4 damage instead.
+
+ShadowBolt
+Deal 4 damage to a minion.
+
+DrainLife
+Deal 2 damage. Restore #2 Health to your hero.
+
+Cleave
+Deal 2 damage to two random enemy minions.
+
+BlessingofKings
+Give a minion +4/+4. (+4 Attack/+4 Health)
+
+Hellfire
+Deal 3 damage to ALL characters.
+
+FrostShock
+Deal 1 damage to an enemy character and Freeze it.
+
+Soulfire
+Deal 4 damage. Discard a random card.
+
+Corruption
+Choose an enemy minion. At the start of your turn, destroy it.
+
+Conceal
+Give your minions Stealth until your next turn.
+
+Flamestrike
+Deal 4 damage to all enemy minions.
+
+HeroicStrike
+Give your hero +4 Attack this turn.
+
+ShieldBlock
+Gain 5 Armor. Draw a card.
+
+CommandingShout
+Your minions can't be reduced below 1 Health this turn. Draw a card.
+
+Tracking
+Look at the top three cards of your deck. Draw one and discard the others.
+
+Claw
+Give your hero +2 Attack this turn and 2 Armor.
+
+BladeFlurry
+Destroy your weapon and deal its damage to all enemies.
+
+Slam
+Deal 2 damage to a minion. If it survives, draw a card.
+
+MirrorImage
+Summon two 0/2 minions with Taunt.
+
+Pyroblast
+Deal 10 damage.
+
+Misdirection
+Secret: When a character attacks your hero, instead he attacks another random character.
+
+MortalCoil
+Deal 1 damage to a minion. If that kills it, draw a card.
+
+DeadlyShot
+Destroy a random enemy minion.
+
+MindVision
+Put a copy of a random card in your opponent's hand into your hand.
+
+SiphonSoul
+Destroy a minion. Restore #3 Health to your hero.
+
+Rampage
+Give a damaged minion +3/+3.
+
+WildGrowth
+Gain an empty Mana Crystal.
+
+Demonfire
+Deal 2 damage to a minion. If it’s a friendly Demon, give it +2/+2 instead.
+
+Preparation
+The next spell you cast this turn costs (3) less.
+
+Bloodlust
+Give your minions +3 Attack this turn.
+
+AvengingWrath
+Deal 8 damage randomly split among enemy characters.
+
+Silence
+Silence a minion.
+
+UnleashtheHounds
+For each enemy minion, summon a 1/1 Hound with Charge.
+
+DivineSpirit
+Double a minion's Health.
+
+CircleofHealing
+Restore #4 Health to ALL minions.
+
+ShadowWordDeath
+Destroy a minion with an Attack of 5 or more.
+
+HolyFire
+Deal 5 damage. Restore 5 Health to your hero.
+
+MassDispel
+Silence all enemy minions. Draw a card.
+
+ShadowWordPain
+Destroy a minion with 3 or less Attack.
+
+Shadowform
+Your Hero Power becomes 'Deal 2 damage'. If already in Shadowform: 3 damage.
+
+BlessingofWisdom
+Choose a minion. Whenever it attacks, draw a card.
+
+BlessedChampion
+Double a minion's Attack.
+
+SolemnVigil
+Draw 2 cards. Costs (1) less for each minion that died this turn.
+
+DragonsBreath
+Deal 4 damage. Costs (1) less for each minion that died this turn.
+
+Demonwrath
+Deal 2 damage to all non-Demon minions.
+
+GangUp
+Choose a minion. Shuffle 3 copies of it into your deck.
+
+LavaShock
+Deal 2 damage. Unlock your Overloaded Mana Crystals.
+
+QuickShot
+Deal 3 damage. If your hand is empty, draw a card.
+
+Revenge
+Deal 1 damage to all minions. If you have 12 or less Health, deal 3 damage instead.
+
+Resurrect
+Summon a random friendly minion that died this game.
+
+EveryfinisAwesome
+Give your minions +2/+2. Costs (1) less for each Murloc you control.
+
+ExplorersHat
+Give a minion +1/+1 and "Deathrattle: Add an Explorer's Hat to your hand."
+
+RavenIdol
+Choose one - Discover a minion; or Discover a spell.
+
+DartTrap
+Secret: When an opposing Hero Power is used, deal 5 damage to a random enemy.
+
+ForgottenTorch
+Deal 3 damage. Shuffle a 'Roaring Torch' into your deck that deals 6 damage.
+
+AnyfinCanHappen
+Summon 7 Murlocs that died this game.
+
+SacredTrial
+Secret: When your opponent has at least 3 minions and plays another, destroy it.
+
+ExcavatedEvil
+Deal 3 damage to all minions. Shuffle this card into your opponent's deck.
+
+Entomb
+Choose an enemy minion. Shuffle it into your deck.
+
+CurseofRafaam
+Give your opponent a 'Cursed!' card. While they hold it, they take 2 damage on their turn.
+
+PrimalFusion
+Give a minion +1/+1 for each of your Totems.
+
+Evolve
+Transform your minions into random minions that cost (1) more.
+
+Infest
+Give your minions "Deathrattle: Add a random Beast to your hand."
+
+FeralRage
+Choose One - Give your hero +4 Attack this turn; or Gain 8 Armor.
+
+MarkofYShaarj
+Give a minion +2/+2. If it's a Beast, draw a card.
+
+OntheHunt
+Deal 1 damage. Summon a 1/1 Mastiff.
+
+JourneyBelow
+Discover a Deathrattle card.
+
+ThistleTea
+Draw a card. Add 2 extra copies of it to your hand.
+
+Shatter
+Destroy a Frozen minion.
+
+ForbiddenFlame
+Spend all your Mana. Deal that much damage to a minion.
+
+CabalistsTome
+Add 3 random Mage spells to your hand.
+
+PowerWordTentacles
+Give a minion +2/+6.
+
+ShadowWordHorror
+Destroy all minions with 2 or less Attack.
+
+ForbiddenShaping
+Spend all your Mana. Summon a random minion that costs that much.
+
+EmbracetheShadow
+This turn, your healing effects deal damage instead.
+
+ForbiddenRitual
+Spend all your Mana. Summon that many 1/1 Tentacles.
+
+SpreadingMadness
+Deal 9 damage randomly split among ALL characters.
+
+RenounceDarkness
+Replace your Hero Power and Warlock cards with another class's. The cards cost (1) less.
+
+ShadowStrike
+Deal 5 damage to an undamaged character.
+
+WispsoftheOldGods
+Choose One - Summon seven 1/1 Wisps; or Give your minions +2/+2.
+
+ForbiddenHealing
+Spend all your Mana. Restore twice that much Health.
+
+Stormcrack
+Deal 4 damage to a minion. Overload: (1)
+
+CalloftheWild
+Summon all three Animal Companions.
+
+DivineStrength
+Give a minion +1/+2.
+
+DOOM
+Destroy all minions. Draw a card for each.
+
+StandAgainstDarkness
+Summon five 1/1 Silver Hand Recruits.
+
+BloodWarriors
+Add a copy of each damaged friendly minion to your hand.
+
+ALightintheDarkness
+Discover a minion. Give it +1/+1.
+
+BloodToIchor
+Deal 1 damage to a minion. If it survives, summon a 2/2 Slime.
+
