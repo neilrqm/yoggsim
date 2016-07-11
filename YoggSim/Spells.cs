@@ -70,7 +70,16 @@ namespace YoggSim
         /// </summary>
         public static void Swipe(Board b)
         {
-
+            Character target = b.GetRandomOpponent();
+            target.Damage += 4;
+            if (target != b.Opponent) b.Opponent.Damage += 1;
+            foreach (Minion m in b.OpponentMinions)
+            {
+                if (m != target)
+                {
+                    m.Damage += 1;
+                }
+            }
         }
         
         /// <summary>
@@ -78,7 +87,8 @@ namespace YoggSim
         /// </summary>
         public static void BlessingofMight(Board b)
         {
-
+            Minion m = b.GetRandomMinion();
+            m.Effects.AttackModifier += 3;
         }
         
         /// <summary>
@@ -86,7 +96,13 @@ namespace YoggSim
         /// </summary>
         public static void Brawl(Board b)
         {
-
+            Minion m = b.GetRandomMinion();
+            bool players = false;
+            if (b.PlayerMinions.Contains(m)) players = true;
+            b.PlayerMinions = new List<Minion>();   // shortcut: this doesn't capture deathrattle effects for cards like Sylvanas, Cairne, etc.
+            b.OpponentMinions = new List<Minion>();
+            if (players) b.PlayerMinions.Add(m);
+            else b.OpponentMinions.Add(m);
         }
         
         /// <summary>
@@ -94,7 +110,9 @@ namespace YoggSim
         /// </summary>
         public static void Polymorph(Board b)
         {
-
+            Minion m = b.GetRandomMinion();
+            if (b.PlayerMinions.Contains(m)) b.PlayerMinions[b.PlayerMinions.IndexOf(m)] = CardFactory.GetOneOne();
+            else b.OpponentMinions[b.OpponentMinions.IndexOf(m)] = CardFactory.GetOneOne();
         }
         
         /// <summary>

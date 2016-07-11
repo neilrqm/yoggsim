@@ -48,6 +48,16 @@ namespace YoggSim
             else return GetRandomMinion();
         }
 
+        public Character GetRandomOpponent()
+        {
+            int characterNumber = Simulation.Rng.Next(OpponentMinions.Count + 1);
+            if (characterNumber < OpponentMinions.Count)
+            {
+                return OpponentMinions[characterNumber];
+            }
+            return Opponent;
+        }
+
         public Player Player { get; set; }
         public Player Opponent { get; set; }
         public List<Minion> PlayerMinions { get; set; }

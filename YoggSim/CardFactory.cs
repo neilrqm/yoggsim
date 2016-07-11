@@ -102,6 +102,26 @@ namespace YoggSim
             public double DeathrattleValue { get; set; } = 0.0;
             public double OtherEffectValue { get; set; } = 0.0;
         }
+        public Minion(Minion source)
+        {
+            Name = source.Name;
+            Mana = source.Mana;
+            Description = source.Description;
+            Effects.AttackModifier = source.Effects.AttackModifier;
+            Effects.HealthModifier = source.Effects.HealthModifier;
+            Effects.DeathrattleValue = source.Effects.DeathrattleValue;
+            Effects.OtherEffectValue = source.Effects.OtherEffectValue;
+            Attack = source.Attack;
+            TotalHealth = source.TotalHealth;
+            Damage = source.Damage;
+        }
+        public Minion(string name, int attack, int health, int mana)
+        {
+            Name = name;
+            Attack = attack;
+            TotalHealth = health;
+            Mana = mana;
+        }
         public Minion(JsonCard card)
         {
             Name = card.name ?? "";
@@ -110,7 +130,6 @@ namespace YoggSim
             TotalHealth = card.health ?? default(int);
             Damage = 0;
             Description = card.description ?? "";
-            Effects = new EffectList();
             if (Description.Contains("Deathrattle"))
             {
                 Effects.DeathrattleValue = GetDeathrattleValue(card);
@@ -118,10 +137,10 @@ namespace YoggSim
             Effects.OtherEffectValue = GetOtherEffectValue(card);
         }
 
-        public string Name { get; private set; }
-        public int Mana { get; private set; }
-        public string Description { get; private set; }
-        public EffectList Effects { get; private set; }
+        public string Name { get; private set; } = "";
+        public int Mana { get; private set; } = 0;
+        public string Description { get; private set; } = "Empty card";
+        public EffectList Effects { get; private set; } = new EffectList();
 
         private static double GetOtherEffectValue(JsonCard card)
         {
@@ -244,17 +263,22 @@ namespace YoggSim
 
         public static Minion GetRandomMinion()
         {
-            return minions[Simulation.Rng.Next(minions.Count)];
+            return new Minion(minions[Simulation.Rng.Next(minions.Count)]);
         }
 
         public static Spell GetRandomSpell()
         {
-            return spells[Simulation.Rng.Next(spells.Count)];
+            return spells[Simulation.Rng.Next(spells.Count)];   // we don't modify spells, so they don't need to be copied.
         }
 
         public static Minion GetRandomDemon()
         {
-            return demons[Simulation.Rng.Next(demons.Count)];
+            return new Minion(demons[Simulation.Rng.Next(demons.Count)]);
+        }
+
+        public static Minion GetOneOne()
+        {
+            return new Minion("OneOne", 1, 1, 0);
         }
     }
 }
