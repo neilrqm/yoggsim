@@ -114,6 +114,7 @@ namespace YoggSim
             Attack = source.Attack;
             TotalHealth = source.TotalHealth;
             Damage = source.Damage;
+            Race = source.Race;
         }
         public Minion(string name, int attack, int health, int mana)
         {
@@ -128,6 +129,7 @@ namespace YoggSim
             Mana = card.mana ?? default(int);
             Attack = card.attack ?? default(int);
             TotalHealth = card.health ?? default(int);
+            Race = card.race ?? "";
             Damage = 0;
             Description = card.description ?? "";
             if (Description.Contains("Deathrattle"))
@@ -137,9 +139,16 @@ namespace YoggSim
             Effects.OtherEffectValue = GetOtherEffectValue(card);
         }
 
+        public new void ModifyHealth(int value)
+        {
+            base.ModifyHealth(value);
+        }
+
         public string Name { get; private set; } = "";
         public int Mana { get; private set; } = 0;
         public string Description { get; private set; } = "Empty card";
+        public string Race { get; private set; } = "";
+        public bool CreatedByYogg { get; set; } = false;
         public EffectList Effects { get; private set; } = new EffectList();
 
         private static double GetOtherEffectValue(JsonCard card)
@@ -205,13 +214,14 @@ namespace YoggSim
         static CardFactory()
         {
             JsonCardList cards;
+            string cardDataFilePath = "../../../../hearthstone-db/cards/all-collectibles.json";
             string[] standardSets = new string[] { "basic", "expert", "brm", "loe", "wtog" };
             // using card info JSON file from https://github.com/pdyck/hearthstone-db/
-            if (!File.Exists("all-collectibles.json"))
+            if (!File.Exists(cardDataFilePath))
             {
                 throw new ImportException("Could not find card data file.");
             }
-            using (Stream stream = File.OpenRead("all-collectibles.json"))
+            using (Stream stream = File.OpenRead(cardDataFilePath))
             {
                 DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(JsonCardList));
                 cards = (JsonCardList)ser.ReadObject(stream);

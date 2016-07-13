@@ -42,8 +42,18 @@ namespace YoggSim
             if (HandSize < 0) HandSize = 0;
         }
 
+        public new void ModifyHealth(int value)
+        {
+            if (value < 0) TotalFaceDamage += value;
+            else TotalFaceHeal += value;
+            base.ModifyHealth(value);
+        }
+
         public int HandSize { get; set; }
-        public int TotalDraws { get; set; }
-        public int TotalMills { get; set; }
+        public int TotalDraws { get; set; } = 0;
+        public int TotalMills { get; set; } = 0;
+        public int TotalFaceDamage { get; set; } = 0;
+        public int TotalFaceHeal { get; set; } = 0;
+        public double SecretValue { get; set; } = 0;
     }
 }

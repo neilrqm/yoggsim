@@ -6,11 +6,17 @@ using System.Threading.Tasks;
 
 namespace YoggSim
 {
-    public class Character
+    abstract public class Character
     {
         public Character()
         {
 
+        }
+
+        public void ModifyHealth(int value)
+        {
+            Damage -= value;
+            if (Damage < 0) Damage = 0;
         }
 
         public int TotalHealth { get; protected set; }
@@ -27,5 +33,6 @@ namespace YoggSim
         }
         public int Attack { get; protected set; }
         public int Damage { get; set; }
+        public bool Frozen { get; set; } = false;   // could do some fancy stuff with the Minion.EffectList class if this status stuff gets out of hand.
     }
 }

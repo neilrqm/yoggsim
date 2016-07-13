@@ -58,6 +58,54 @@ namespace YoggSim
             return Opponent;
         }
 
+        public Minion GetRandomFriendlyMinion()
+        {
+            int minionNumber = Simulation.Rng.Next(PlayerMinions.Count);
+            return PlayerMinions[minionNumber];
+        }
+
+        public Minion GetRandomDemon()
+        {
+            List<Minion> demonsOnBoard = new List<Minion>();
+            foreach (Minion m in PlayerMinions)
+            {
+                if (m.Race == "demon" && m.CreatedByYogg)   // shortcut (or refinement???): assuming Yogg isn't run in a deck that naturally runs demons
+                {
+                    demonsOnBoard.Add(m);
+                }
+            }
+            foreach (Minion m in OpponentMinions)
+            {
+                // shortcut: assume an 8/9 chance that a randomly selected minion is incorrectly marked as a demon
+                if (m.Race == "demon" && (Simulation.Rng.Next(9) == 0 || m.CreatedByYogg))
+                {
+                    demonsOnBoard.Add(m);
+                }
+            }
+            if (demonsOnBoard.Count == 0) return null;
+            return demonsOnBoard[Simulation.Rng.Next(demonsOnBoard.Count)];
+        }
+
+        public Character GetRandomUndamagedCharacter(bool minionsOnly)
+        {
+            List<Character> validCharacters = new List<Character>();
+            if (!minionsOnly)
+            {
+                if (Player.Damage == 0) validCharacters.Add(Player);
+                if (Opponent.Damage == 0) validCharacters.Add(Opponent);
+            }
+            foreach (Minion m in PlayerMinions)
+            {
+                if (m.Damage == 0) validCharacters.Add(m);
+            }
+            foreach (Minion m in OpponentMinions)
+            {
+                if (m.Damage == 0) validCharacters.Add(m);
+            }
+            if (validCharacters.Count == 0) return null;
+            return validCharacters[Simulation.Rng.Next(validCharacters.Count)];
+        }
+
         public Player Player { get; set; }
         public Player Opponent { get; set; }
         public List<Minion> PlayerMinions { get; set; }
