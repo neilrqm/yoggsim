@@ -47,6 +47,7 @@
     <Compile Include="Board.cs" />
     <Compile Include="CardFactory.cs" />
     <Compile Include="Character.cs" />
+    <Compile Include="Minion.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

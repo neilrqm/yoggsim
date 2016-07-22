@@ -67,7 +67,7 @@ namespace YoggSim
         {
             Minion m = b.GetRandomMinion();
             if (m == null) return;
-            m.Effects.OtherEffectValue += Simulation.WindfuryManaModifier;    // doesn't handle situation where minion already has windfury
+            m.Effects.OtherEffectValue += Simulation.WindfuryManaValue;    // doesn't handle situation where minion already has windfury
         }
         
         /// <summary>
@@ -119,8 +119,8 @@ namespace YoggSim
         {
             Minion m = b.GetRandomMinion();
             if (m == null) return;
-            if (b.PlayerMinions.Contains(m)) b.PlayerMinions[b.PlayerMinions.IndexOf(m)] = CardFactory.GetOneOne();
-            else if (b.OpponentMinions.Contains(m)) b.OpponentMinions[b.OpponentMinions.IndexOf(m)] = CardFactory.GetOneOne();
+            if (b.PlayerMinions.Contains(m)) b.PlayerMinions[b.PlayerMinions.IndexOf(m)] = new Minion("Sheep", 1, 1, 0, 0);
+            else if (b.OpponentMinions.Contains(m)) b.OpponentMinions[b.OpponentMinions.IndexOf(m)] = new Minion("Sheep", 1, 1, 0, 0);
             else throw new Exception("Got a random minion that isn't on the board.");
         }
         
@@ -173,7 +173,7 @@ namespace YoggSim
         /// </summary>
         public static void Counterspell(Board b)
         {
-            b.Player.SecretValue += Simulation.MageSecretManaModifier;
+            b.Player.AddSecretValue(Simulation.MageSecretManaValue);
         }
         
         /// <summary>
@@ -181,7 +181,7 @@ namespace YoggSim
         /// </summary>
         public static void Redemption(Board b)
         {
-            b.Player.SecretValue += Simulation.PaladinSecretManaModifier;
+            b.Player.AddSecretValue(Simulation.PaladinSecretManaValue);
         }
         
         /// <summary>
@@ -229,7 +229,7 @@ namespace YoggSim
             Minion m = b.GetRandomMinion();
             if (m == null) return;
             m.Damage = 0;
-            m.Effects.OtherEffectValue += Simulation.TauntManaModifier;
+            m.Effects.OtherEffectValue += Simulation.TauntManaValue;
         }
         
         /// <summary>
@@ -247,7 +247,7 @@ namespace YoggSim
             else if (coinFlip == 1)
             {
                 m.Effects.HealthModifier += 4;
-                m.Effects.OtherEffectValue += Simulation.TauntManaModifier;
+                m.Effects.OtherEffectValue += Simulation.TauntManaValue;
             }
         }
         
@@ -299,7 +299,7 @@ namespace YoggSim
         /// </summary>
         public static void IceBlock(Board b)
         {
-            b.Player.SecretValue += Simulation.MageSecretManaModifier;
+            b.Player.AddSecretValue(Simulation.MageSecretManaValue);
         }
         
         /// <summary>
@@ -307,7 +307,7 @@ namespace YoggSim
         /// </summary>
         public static void MirrorEntity(Board b)
         {
-            b.Player.SecretValue += Simulation.MageSecretManaModifier;
+            b.Player.AddSecretValue(Simulation.MageSecretManaValue);
         }
         
         /// <summary>
@@ -330,7 +330,7 @@ namespace YoggSim
             if (m == null) return;
             m.Effects.AttackModifier += 2;
             m.Effects.HealthModifier += 2;
-            m.Effects.OtherEffectValue += Simulation.TauntManaModifier;
+            m.Effects.OtherEffectValue += Simulation.TauntManaValue;
         }
         
         /// <summary>
@@ -338,7 +338,20 @@ namespace YoggSim
         /// </summary>
         public static void ShadowMadness(Board b)
         {
-
+            List<Minion> qualifyingMinions = new List<Minion>();
+            if (b.PlayerMinions.Count >= 7) return; // board full
+            foreach (Minion m in b.OpponentMinions)
+            {
+                if (m.ActualAttack <= 3)
+                {
+                    qualifyingMinions.Add(m);
+                }
+            }
+            if (qualifyingMinions.Count == 0) return; // no qualifying minions
+            Minion selectedMinion = qualifyingMinions[Simulation.Rng.Next(qualifyingMinions.Count)];
+            selectedMinion.ReturnToOpponent = true;
+            b.OpponentMinions.Remove(selectedMinion);
+            b.PlayerMinions.Add(selectedMinion);
         }
         
         /// <summary>
@@ -346,7 +359,7 @@ namespace YoggSim
         /// </summary>
         public static void Repentance(Board b)
         {
-
+            b.Player.AddSecretValue(Simulation.PaladinSecretManaValue);
         }
         
         /// <summary>
@@ -354,7 +367,19 @@ namespace YoggSim
         /// </summary>
         public static void Naturalize(Board b)
         {
-
+            Minion m = b.GetRandomMinion();
+            if (m == null) return;
+            if (b.PlayerMinions.Contains(m))
+            {
+                b.PlayerMinions.Remove(m);
+                b.Player.ActivatedDeathrattleValue += m.Effects.DeathrattleValue;
+            }
+            if (b.OpponentMinions.Contains(m))
+            {
+                b.OpponentMinions.Remove(m);
+                b.Opponent.ActivatedDeathrattleValue += m.Effects.DeathrattleValue;
+            }
+            b.Opponent.Draw(2);
         }
         
         /// <summary>
@@ -362,7 +387,10 @@ namespace YoggSim
         /// </summary>
         public static void FeralSpirit(Board b)
         {
-
+            for (int i = 0; i < 2 && b.PlayerMinions.Count < 7; i++)
+            {
+                b.PlayerMinions.Add(new Minion("FeralSpirit Wolf", 2, 3, 2, Simulation.TauntManaValue));
+            }
         }
         
         /// <summary>
@@ -370,7 +398,12 @@ namespace YoggSim
         /// </summary>
         public static void RockbiterWeapon(Board b)
         {
-
+            Character c = b.GetRandomFriendlyCharacter();
+            if (c is Player)
+            {
+                ((Player)c).HeroAttackBuff += 3;
+            }
+            // shortcut: ignoring the effect of Rockbiter on minions since it's unlikely to fall on a minion that can attack.
         }
         
         /// <summary>
@@ -378,7 +411,9 @@ namespace YoggSim
         /// </summary>
         public static void HammerofWrath(Board b)
         {
-
+            Character c = b.GetRandomCharacter();
+            c.ModifyHealth(-3);
+            b.Player.Draw(1);
         }
         
         /// <summary>
@@ -386,7 +421,10 @@ namespace YoggSim
         /// </summary>
         public static void Innervate(Board b)
         {
-
+            // This isn't going to have much of an effect usually.  It will allow the player to get
+            // in a hero power, so I'm giving it a value of 1 in terms of mana swing.  You could justify
+            // increasing this slightly to account for the ability to play a 2-mana minion.
+            b.Player.OtherEffectManaValue += 1;
         }
         
         /// <summary>
@@ -394,7 +432,9 @@ namespace YoggSim
         /// </summary>
         public static void ColdBlood(Board b)
         {
-
+            Minion m = b.GetRandomMinion();
+            if (m == null) return;
+            m.Effects.AttackModifier += 4;  // always comboed with Yogg, I guess?
         }
         
         /// <summary>
@@ -402,7 +442,8 @@ namespace YoggSim
         /// </summary>
         public static void HolySmite(Board b)
         {
-
+            Character c = b.GetRandomCharacter();
+            c.ModifyHealth(-2);
         }
         
         /// <summary>
@@ -410,7 +451,10 @@ namespace YoggSim
         /// </summary>
         public static void Betrayal(Board b)
         {
-
+            Minion m = b.GetRandomOpponentMinion();
+            int i = b.OpponentMinions.IndexOf(m);
+            if (i > 0) b.OpponentMinions[i - 1].ModifyHealth(-m.ActualAttack);
+            if (i < b.OpponentMinions.Count - 1) b.OpponentMinions[i + 1].ModifyHealth(-m.ActualAttack);
         }
         
         /// <summary>
@@ -418,7 +462,7 @@ namespace YoggSim
         /// </summary>
         public static void Vaporize(Board b)
         {
-
+            b.Player.AddSecretValue(Simulation.MageSecretManaValue);
         }
         
         /// <summary>
@@ -426,7 +470,8 @@ namespace YoggSim
         /// </summary>
         public static void HolyLight(Board b)
         {
-
+            Character c = b.GetRandomCharacter();
+            c.ModifyHealth(6);
         }
         
         /// <summary>
@@ -434,7 +479,15 @@ namespace YoggSim
         /// </summary>
         public static void MultiShot(Board b)
         {
-
+            // I'm guessing this fizzles if the opponent has only 1 minion on board.
+            if (b.OpponentMinions.Count >= 2)
+            {
+                Minion m1 = b.GetRandomOpponentMinion();
+                Minion m2 = b.GetRandomOpponentMinion();
+                while (m2 != m1) m2 = b.GetRandomOpponentMinion();
+                m1.ModifyHealth(-3);
+                m2.ModifyHealth(-3);
+            }
         }
         
         /// <summary>
@@ -442,7 +495,23 @@ namespace YoggSim
         /// </summary>
         public static void KillCommand(Board b)
         {
-
+            Character c = b.GetRandomCharacter();
+            bool hasBeast = false;
+            foreach (Minion m in b.PlayerMinions)
+            {
+                if (m.Race == "beast") hasBeast = true;
+            }
+            // Guessing that beasts are relatively unlikely to be played compared to their population
+            // in the card pool (but more likely than demons), so I'm weighting the likelihood of a random
+            // minion being marked as a beast erroneously as 2/3.
+            if (hasBeast && Simulation.Rng.Next(9) < 3)
+            {
+                c.ModifyHealth(-5);
+            }
+            else
+            {
+                c.ModifyHealth(-3);
+            }
         }
         
         /// <summary>
@@ -450,7 +519,15 @@ namespace YoggSim
         /// </summary>
         public static void ForkedLightning(Board b)
         {
-
+            // I'm guessing this fizzles if the opponent has only 1 minion on board.
+            if (b.OpponentMinions.Count >= 2)
+            {
+                Minion m1 = b.GetRandomOpponentMinion();
+                Minion m2 = b.GetRandomOpponentMinion();
+                while (m2 != m1) m2 = b.GetRandomOpponentMinion();
+                m1.ModifyHealth(-2);
+                m2.ModifyHealth(-2);
+            }
         }
         
         /// <summary>
@@ -458,7 +535,8 @@ namespace YoggSim
         /// </summary>
         public static void Fireball(Board b)
         {
-
+            Character c = b.GetRandomCharacter();
+            c.ModifyHealth(-6);
         }
         
         /// <summary>
@@ -466,7 +544,13 @@ namespace YoggSim
         /// </summary>
         public static void Charge(Board b)
         {
-
+            Minion m = b.GetRandomFriendlyMinion();
+            m.Effects.AttackModifier += 2;
+            // not sure what the value of charge is, but it seems to be based on the minion's attack
+            // value.  I'm assigning it a weight of 0.4 * the attack value, based on the attack mana modifier
+            // of 0.5 reduced by the possibility of the minion only being able to attack face (but this might
+            // be too cute, who knows).
+            if (m.CreatedByYogg) m.Effects.OtherEffectValue += (double)m.ActualAttack * Simulation.ChargeManaModifier;
         }
         
         /// <summary>
@@ -474,7 +558,9 @@ namespace YoggSim
         /// </summary>
         public static void Assassinate(Board b)
         {
-
+            Minion m = b.GetRandomOpponentMinion();
+            if (m == null) return;
+            b.OpponentMinions.Remove(m);
         }
         
         /// <summary>
@@ -482,7 +568,13 @@ namespace YoggSim
         /// </summary>
         public static void Shadowstep(Board b)
         {
-
+            Minion m = b.GetRandomFriendlyMinion();
+            if (m == null) return;
+            b.PlayerMinions.Remove(m);
+            b.Player.AddCards(1);
+            // Player gets 2 extra mana of value, but it's probably going to be 2 turns before the 
+            // card can affect the board again, so I'm weighting the value.
+            b.Player.OtherEffectManaValue += Simulation.CardDiscountManaModifier * 2;
         }
         
         /// <summary>
@@ -490,7 +582,7 @@ namespace YoggSim
         /// </summary>
         public static void Spellbender(Board b)
         {
-
+            b.Player.AddSecretValue(Simulation.MageSecretManaValue);
         }
         
         /// <summary>
@@ -498,6 +590,9 @@ namespace YoggSim
         /// </summary>
         public static void InnerFire(Board b)
         {
+            Minion m = b.GetRandomMinion();
+            if (m == null) return;
+            m.Effects.AttackModifier = m.ActualHealth - m.Attack;
 
         }
         
@@ -506,7 +601,10 @@ namespace YoggSim
         /// </summary>
         public static void SouloftheForest(Board b)
         {
-
+            foreach (Minion m in b.PlayerMinions)
+            {
+                m.Effects.DeathrattleValue += 1;
+            }
         }
         
         /// <summary>
@@ -514,7 +612,21 @@ namespace YoggSim
         /// </summary>
         public static void ExplosiveShot(Board b)
         {
-
+            Minion m = b.GetRandomMinion();
+            if (m == null) return;
+            m.ModifyHealth(-5);
+            if (b.OpponentMinions.Contains(m))
+            {
+                int i = b.OpponentMinions.IndexOf(m);
+                if (i > 0) b.OpponentMinions[i - 1].ModifyHealth(-2);
+                if (i < b.OpponentMinions.Count - 1) b.OpponentMinions[i + 1].ModifyHealth(-2);
+            }
+            else if (b.PlayerMinions.Contains(m))
+            {
+                int i = b.PlayerMinions.IndexOf(m);
+                if (i > 0) b.PlayerMinions[i - 1].ModifyHealth(-2);
+                if (i < b.PlayerMinions.Count - 1) b.PlayerMinions[i + 1].ModifyHealth(-2);
+            }
         }
         
         /// <summary>
@@ -522,7 +634,13 @@ namespace YoggSim
         /// </summary>
         public static void BattleRage(Board b)
         {
-
+            int totalDraws = 0;
+            if (b.Player.Damage > 0) totalDraws++;
+            foreach (Minion m in b.PlayerMinions)
+            {
+                if (m.Damage > 0) totalDraws++;
+            }
+            b.Player.Draw(totalDraws);
         }
         
         /// <summary>
@@ -530,7 +648,10 @@ namespace YoggSim
         /// </summary>
         public static void AncestralSpirit(Board b)
         {
-
+            Minion m = b.GetRandomMinion();
+            if (m == null) return;
+            // Hey, free mana!  But not liquid.  Takes a while to cash in.
+            m.Effects.DeathrattleValue += m.Mana * Simulation.ResummonMinionDeathrattleModifier;
         }
         
         /// <summary>
@@ -538,7 +659,38 @@ namespace YoggSim
         /// </summary>
         public static void ConeofCold(Board b)
         {
-
+            Minion m = b.GetRandomMinion();
+            if (m == null) return;
+            m.ModifyHealth(-1);
+            m.Frozen = true;
+            if (b.OpponentMinions.Contains(m))
+            {
+                int i = b.OpponentMinions.IndexOf(m);
+                if (i > 0)
+                {
+                    b.OpponentMinions[i - 1].ModifyHealth(-1);
+                    b.OpponentMinions[i - 1].Frozen = true;
+                }
+                if (i < b.OpponentMinions.Count - 1)
+                {
+                    b.OpponentMinions[i + 1].ModifyHealth(-1);
+                    b.OpponentMinions[i + 1].Frozen = true;
+                }
+            }
+            else if (b.PlayerMinions.Contains(m))
+            {
+                int i = b.PlayerMinions.IndexOf(m);
+                if (i > 0)
+                {
+                    b.PlayerMinions[i - 1].ModifyHealth(-1);
+                    b.PlayerMinions[i - 1].Frozen = true;
+                }
+                if (i < b.PlayerMinions.Count - 1)
+                {
+                    b.PlayerMinions[i + 1].ModifyHealth(-1);
+                    b.PlayerMinions[i + 1].Frozen = true;
+                }
+            }
         }
         
         /// <summary>
@@ -546,7 +698,9 @@ namespace YoggSim
         /// </summary>
         public static void HolyWrath(Board b)
         {
-
+            // let's just draw a random minion and hope it's close enough to a real situation.
+            Character c = b.GetRandomCharacter();
+            c.ModifyHealth(-CardFactory.GetRandomMinion().Mana);
         }
         
         /// <summary>
@@ -554,7 +708,22 @@ namespace YoggSim
         /// </summary>
         public static void AnimalCompanion(Board b)
         {
-
+            if (b.PlayerMinions.Count >= 7) return;
+            switch (Simulation.Rng.Next(3))
+            {
+                case 0:
+                    //summon huffer
+                    b.PlayerMinions.Add(new Minion("Huffer", 4, 2, 3, Simulation.ChargeManaModifier * 4));
+                    break;
+                case 1:
+                    // summon huffer
+                    b.PlayerMinions.Add(new Minion("Leokk", 2, 4, 3, Simulation.AttackBuffOtherMinionsModifier * 1));
+                    break;
+                case 2:
+                    // summon huffer
+                    b.PlayerMinions.Add(new Minion("Misha", 4, 4, 3, Simulation.TauntManaValue));
+                    break;
+            }
         }
         
         /// <summary>
@@ -562,7 +731,10 @@ namespace YoggSim
         /// </summary>
         public static void ArcaneExplosion(Board b)
         {
-
+            foreach (Minion m in b.OpponentMinions)
+            {
+                m.ModifyHealth(-1);
+            }
         }
         
         /// <summary>
@@ -570,7 +742,7 @@ namespace YoggSim
         /// </summary>
         public static void SnakeTrap(Board b)
         {
-
+            b.Player.AddSecretValue(Simulation.HunterSecretManaValue);
         }
         
         /// <summary>
@@ -578,7 +750,11 @@ namespace YoggSim
         /// </summary>
         public static void Blizzard(Board b)
         {
-
+            foreach (Minion m in b.OpponentMinions)
+            {
+                m.ModifyHealth(-2);
+                m.Frozen = true;
+            }
         }
         
         /// <summary>
@@ -586,7 +762,7 @@ namespace YoggSim
         /// </summary>
         public static void DeadlyPoison(Board b)
         {
-
+            // shortcut: Imma just ignore weapons for now.
         }
         
         /// <summary>
@@ -594,7 +770,10 @@ namespace YoggSim
         /// </summary>
         public static void Sap(Board b)
         {
-
+            Minion m = b.GetRandomOpponentMinion();
+            if (m == null) return;
+            b.OpponentMinions.Remove(m);
+            b.Opponent.AddCards(1);
         }
         
         /// <summary>
@@ -602,7 +781,7 @@ namespace YoggSim
         /// </summary>
         public static void EyeforanEye(Board b)
         {
-
+            b.Player.AddSecretValue(Simulation.PaladinSecretManaValue);
         }
         
         /// <summary>
@@ -610,7 +789,8 @@ namespace YoggSim
         /// </summary>
         public static void Moonfire(Board b)
         {
-
+            Character c = b.GetRandomCharacter();
+            c.ModifyHealth(-1);
         }
         
         /// <summary>
@@ -618,7 +798,11 @@ namespace YoggSim
         /// </summary>
         public static void Consecration(Board b)
         {
-
+            b.Opponent.ModifyHealth(-2);
+            foreach (Minion m in b.OpponentMinions)
+            {
+                m.ModifyHealth(-2);
+            }
         }
         
         /// <summary>
@@ -626,15 +810,20 @@ namespace YoggSim
         /// </summary>
         public static void Savagery(Board b)
         {
-
+            Minion m = b.GetRandomMinion();
+            if (m == null) return;
+            m.ModifyHealth(b.Player.ActualAttack);
         }
         
         /// <summary>
-        /// Summon three 2/2 Treants with Charge that die at the end of the turn.
+        /// Summon three 2/2 Treants
         /// </summary>
         public static void ForceofNature(Board b)
         {
-
+            for (int i = 0; i < 3 && b.PlayerMinions.Count < 7; i++)
+            {
+                b.PlayerMinions.Add(new Minion("FON Treant", 2, 2, 2, 0));
+            }
         }
         
         /// <summary>
@@ -642,7 +831,22 @@ namespace YoggSim
         /// </summary>
         public static void PoweroftheWild(Board b)
         {
-
+            int coinFlip = Simulation.Rng.Next(2);
+            if (coinFlip == 0)
+            {
+                foreach (Minion m in b.PlayerMinions)
+                {
+                    m.Effects.AttackModifier++;
+                    m.Effects.HealthModifier++;
+                }
+            }
+            else if (coinFlip == 1)
+            {
+                if (b.PlayerMinions.Count < 7)
+                {
+                    b.PlayerMinions.Add(new Minion("PotW Panther", 3, 2, 2, 0));
+                }
+            }
         }
         
         /// <summary>
@@ -650,7 +854,8 @@ namespace YoggSim
         /// </summary>
         public static void LightningBolt(Board b)
         {
-
+            Character c = b.GetRandomCharacter();
+            c.ModifyHealth(-3);
         }
         
         /// <summary>
@@ -658,7 +863,7 @@ namespace YoggSim
         /// </summary>
         public static void Upgrade(Board b)
         {
-
+            // shortcut: ignoring weapons for now
         }
         
         /// <summary>
@@ -666,7 +871,7 @@ namespace YoggSim
         /// </summary>
         public static void FreezingTrap(Board b)
         {
-
+            b.Player.AddSecretValue(Simulation.HunterSecretManaValue);
         }
         
         /// <summary>
@@ -674,7 +879,7 @@ namespace YoggSim
         /// </summary>
         public static void MindBlast(Board b)
         {
-
+            b.Opponent.ModifyHealth(-5);
         }
         
         /// <summary>
@@ -682,7 +887,9 @@ namespace YoggSim
         /// </summary>
         public static void ShieldSlam(Board b)
         {
-
+            Minion m = b.GetRandomMinion();
+            if (m == null) return;
+            m.ModifyHealth(-b.Player.Armour);
         }
         
         /// <summary>
@@ -690,7 +897,7 @@ namespace YoggSim
         /// </summary>
         public static void ArcaneIntellect(Board b)
         {
-
+            b.Player.Draw(2);
         }
         
         /// <summary>
@@ -698,7 +905,11 @@ namespace YoggSim
         /// </summary>
         public static void ArcaneMissiles(Board b)
         {
-
+            for (int i = 0; i < 3; i++)
+            {
+                Character c = b.GetRandomOpponent();
+                c.ModifyHealth(-1);
+            }
         }
         
         /// <summary>
@@ -706,7 +917,9 @@ namespace YoggSim
         /// </summary>
         public static void Shiv(Board b)
         {
-
+            Character c = b.GetRandomCharacter();
+            c.ModifyHealth(-1);
+            b.Player.Draw(1);
         }
         
         /// <summary>
@@ -714,7 +927,8 @@ namespace YoggSim
         /// </summary>
         public static void Bite(Board b)
         {
-
+            b.Player.HeroAttackBuff += 4;
+            b.Player.Armour += 4;
         }
         
         /// <summary>
@@ -722,7 +936,7 @@ namespace YoggSim
         /// </summary>
         public static void NobleSacrifice(Board b)
         {
-
+            b.Player.AddSecretValue(Simulation.PaladinSecretManaValue);
         }
         
         /// <summary>
@@ -730,7 +944,7 @@ namespace YoggSim
         /// </summary>
         public static void ExplosiveTrap(Board b)
         {
-
+            b.Player.AddSecretValue(Simulation.HunterSecretManaValue);
         }
         
         /// <summary>
@@ -738,7 +952,10 @@ namespace YoggSim
         /// </summary>
         public static void FrostNova(Board b)
         {
-
+            foreach (Minion m in b.OpponentMinions)
+            {
+                m.Frozen = true;
+            }
         }
         
         /// <summary>
@@ -746,7 +963,9 @@ namespace YoggSim
         /// </summary>
         public static void LayonHands(Board b)
         {
-
+            Character c = b.GetRandomCharacter();
+            c.ModifyHealth(8);
+            b.Player.Draw(3);
         }
         
         /// <summary>
@@ -754,7 +973,10 @@ namespace YoggSim
         /// </summary>
         public static void PowerWordShield(Board b)
         {
-
+            Minion m = b.GetRandomMinion();
+            if (m == null) return;
+            m.Effects.HealthModifier += 2;
+            b.Player.Draw(1);
         }
         
         /// <summary>
@@ -762,7 +984,7 @@ namespace YoggSim
         /// </summary>
         public static void IceBarrier(Board b)
         {
-
+            b.Player.AddSecretValue(Simulation.MageSecretManaValue);
         }
         
         /// <summary>
@@ -770,7 +992,12 @@ namespace YoggSim
         /// </summary>
         public static void LightningStorm(Board b)
         {
-
+            foreach (Minion m in b.OpponentMinions)
+            {
+                int damage = 2 + Simulation.Rng.Next(2);
+                if (damage != 2 && damage != 3) throw new Exception("Invalid result from RNG source");
+                m.ModifyHealth(-damage);
+            }
         }
         
         /// <summary>
@@ -778,7 +1005,7 @@ namespace YoggSim
         /// </summary>
         public static void Sprint(Board b)
         {
-
+            b.Player.Draw(4);
         }
         
         /// <summary>
@@ -786,7 +1013,14 @@ namespace YoggSim
         /// </summary>
         public static void Whirlwind(Board b)
         {
-
+            foreach (Minion m in b.PlayerMinions)
+            {
+                m.ModifyHealth(-1);
+            }
+            foreach (Minion m in b.OpponentMinions)
+            {
+                m.ModifyHealth(-1);
+            }
         }
         
         /// <summary>
@@ -794,7 +1028,9 @@ namespace YoggSim
         /// </summary>
         public static void Frostbolt(Board b)
         {
-
+            Character c = b.GetRandomCharacter();
+            c.ModifyHealth(-3);
+            c.Frozen = true;
         }
         
         /// <summary>
@@ -802,7 +1038,11 @@ namespace YoggSim
         /// </summary>
         public static void FanofKnives(Board b)
         {
-
+            foreach (Minion m in b.OpponentMinions)
+            {
+                m.ModifyHealth(-1);
+            }
+            b.Player.Draw(1);
         }
         
         /// <summary>
@@ -810,7 +1050,10 @@ namespace YoggSim
         /// </summary>
         public static void DivineFavor(Board b)
         {
-
+            if (b.Opponent.HandSize > b.Player.HandSize)
+            {
+                b.Player.Draw(b.Opponent.HandSize - b.Player.HandSize);
+            }
         }
         
         /// <summary>
@@ -818,7 +1061,9 @@ namespace YoggSim
         /// </summary>
         public static void Headcrack(Board b)
         {
-
+            b.Opponent.ModifyHealth(-2);
+            // shortcut: ignoring return to hand because it's low value and more likely to incorrectly
+            // block a draw this turn than it is to incorrectly block a draw next turn.
         }
         
         /// <summary>
@@ -826,7 +1071,7 @@ namespace YoggSim
         /// </summary>
         public static void SinisterStrike(Board b)
         {
-
+            b.Opponent.ModifyHealth(-3);
         }
         
         /// <summary>
@@ -834,7 +1079,9 @@ namespace YoggSim
         /// </summary>
         public static void HandofProtection(Board b)
         {
-
+            Minion m = b.GetRandomMinion();
+            if (m == null) return;
+            m.Effects.OtherEffectValue += Simulation.DivineShieldManaValue;
         }
         
         /// <summary>
@@ -842,7 +1089,11 @@ namespace YoggSim
         /// </summary>
         public static void SavageRoar(Board b)
         {
-
+            b.Player.HeroAttackBuff += 2;
+            foreach (Minion m in b.PlayerMinions)
+            {
+                m.Effects.AttackModifier += 2;
+            }
         }
         
         /// <summary>
@@ -850,7 +1101,16 @@ namespace YoggSim
         /// </summary>
         public static void Equality(Board b)
         {
-
+            foreach (Minion m in b.PlayerMinions)
+            {
+                m.Effects.HealthModifier = 1 - m.TotalHealth;
+                m.Damage = 0;
+            }
+            foreach (Minion m in b.OpponentMinions)
+            {
+                m.Effects.HealthModifier = 1 - m.TotalHealth;
+                m.Damage = 0;
+            }
         }
         
         /// <summary>
@@ -858,7 +1118,14 @@ namespace YoggSim
         /// </summary>
         public static void Hex(Board b)
         {
-
+            Minion m = b.GetRandomMinion();
+            if (m == null) return;
+            List<Minion> side;
+            if (b.OpponentMinions.Contains(m)) side = b.OpponentMinions;
+            else if (b.PlayerMinions.Contains(m)) side = b.PlayerMinions;
+            else throw new Exception("Found minion that's not on the board.");
+            side.Insert(side.IndexOf(m), new Minion("Hex Frog", 0, 1, 0, Simulation.TauntManaValue));
+            side.Remove(m);
         }
         
         /// <summary>
@@ -866,7 +1133,10 @@ namespace YoggSim
         /// </summary>
         public static void EarthShock(Board b)
         {
-
+            Minion m = b.GetRandomMinion();
+            if (m == null) return;
+            m.Silence();
+            m.ModifyHealth(-1);
         }
         
         /// <summary>
@@ -874,7 +1144,8 @@ namespace YoggSim
         /// </summary>
         public static void HealingTouch(Board b)
         {
-
+            Character c = b.GetRandomCharacter();
+            c.ModifyHealth(8);
         }
         
         /// <summary>
@@ -882,7 +1153,19 @@ namespace YoggSim
         /// </summary>
         public static void Execute(Board b)
         {
-
+            List<Minion> damagedMinions = new List<Minion>();
+            foreach (Minion m in b.OpponentMinions)
+            {
+                if (m.Damage > 0)
+                {
+                    damagedMinions.Add(m);
+                }
+            }
+            if (damagedMinions.Count > 0)
+            {
+                Minion m = damagedMinions[Simulation.Rng.Next(damagedMinions.Count)];
+                b.OpponentMinions.Remove(m);
+            }
         }
         
         /// <summary>
@@ -890,7 +1173,8 @@ namespace YoggSim
         /// </summary>
         public static void MortalStrike(Board b)
         {
-
+            Character c = b.GetRandomCharacter();
+            c.ModifyHealth(b.Player.ActualHealth <= 12 ? -6 : -4);
         }
         
         /// <summary>
@@ -898,7 +1182,7 @@ namespace YoggSim
         /// </summary>
         public static void Snipe(Board b)
         {
-
+            b.Player.AddSecretValue(Simulation.HunterSecretManaValue);
         }
         
         /// <summary>
@@ -906,7 +1190,8 @@ namespace YoggSim
         /// </summary>
         public static void FarSight(Board b)
         {
-
+            b.Player.Draw(1);
+            b.Player.OtherEffectManaValue += Simulation.CardDiscountManaModifier * 3.0;
         }
         
         /// <summary>
@@ -914,7 +1199,8 @@ namespace YoggSim
         /// </summary>
         public static void Starfire(Board b)
         {
-
+            b.GetRandomCharacter().ModifyHealth(-5);
+            b.Player.Draw(1);
         }
         
         /// <summary>
@@ -922,7 +1208,7 @@ namespace YoggSim
         /// </summary>
         public static void TotemicMight(Board b)
         {
-
+            // shortcut: assuming that we don't have any totems.
         }
         
         /// <summary>
@@ -930,7 +1216,16 @@ namespace YoggSim
         /// </summary>
         public static void Wrath(Board b)
         {
-
+            int coinFlip = Simulation.Rng.Next(2);
+            if (coinFlip == 0)
+            {
+                b.GetRandomMinion().ModifyHealth(-3);
+            }
+            else
+            {
+                b.GetRandomMinion().ModifyHealth(-1);
+                b.Player.Draw(1);
+            }
         }
         
         /// <summary>
@@ -938,7 +1233,16 @@ namespace YoggSim
         /// </summary>
         public static void HolyNova(Board b)
         {
-
+            b.Opponent.ModifyHealth(-2);
+            b.Player.ModifyHealth(2);
+            foreach (Minion m in b.OpponentMinions)
+            {
+                m.ModifyHealth(-2);
+            }
+            foreach (Minion m in b.PlayerMinions)
+            {
+                m.ModifyHealth(2);
+            }
         }
         
         /// <summary>
@@ -946,7 +1250,11 @@ namespace YoggSim
         /// </summary>
         public static void PowerOverwhelming(Board b)
         {
-
+            Minion m = b.GetRandomFriendlyMinion();
+            if (m == null) return;
+            m.Effects.AttackModifier += 4;
+            m.Effects.HealthModifier += 4;
+            m.Effects.DestroyAtEndOfTurn = true;
         }
         
         /// <summary>
@@ -954,7 +1262,9 @@ namespace YoggSim
         /// </summary>
         public static void Humility(Board b)
         {
-
+            Minion m = b.GetRandomMinion();
+            if (m == null) return;
+            m.Effects.AttackModifier = 1 - m.Attack;
         }
         
         /// <summary>
@@ -962,7 +1272,8 @@ namespace YoggSim
         /// </summary>
         public static void TwistingNether(Board b)
         {
-
+            b.PlayerMinions.Clear();
+            b.OpponentMinions.Clear();
         }
         
         /// <summary>
@@ -970,7 +1281,7 @@ namespace YoggSim
         /// </summary>
         public static void SenseDemons(Board b)
         {
-
+            b.Player.AddCards(2);   // shortcut: ignoring the possibility of the player actually having demons in their deck.
         }
         
         /// <summary>
@@ -978,7 +1289,7 @@ namespace YoggSim
         /// </summary>
         public static void LavaBurst(Board b)
         {
-
+            b.GetRandomCharacter().ModifyHealth(-5);
         }
         
         /// <summary>
@@ -986,7 +1297,7 @@ namespace YoggSim
         /// </summary>
         public static void ArcaneShot(Board b)
         {
-
+            b.GetRandomCharacter().ModifyHealth(-2);
         }
         
         /// <summary>
@@ -994,7 +1305,15 @@ namespace YoggSim
         /// </summary>
         public static void Flare(Board b)
         {
-
+            foreach (Minion m in b.PlayerMinions)
+            {
+                m.Effects.Stealth = false;
+            }
+            foreach (Minion m in b.OpponentMinions)
+            {
+                m.Effects.Stealth = false;
+            }
+            b.Player.Draw(1);
         }
         
         /// <summary>
@@ -1002,7 +1321,22 @@ namespace YoggSim
         /// </summary>
         public static void BestialWrath(Board b)
         {
-
+            List<Minion> beasts = new List<Minion>();
+            foreach (Minion m in b.PlayerMinions)
+            {
+                if (m.Race == "beast") beasts.Add(m);
+            }
+            foreach (Minion m in b.OpponentMinions)
+            {
+                if (m.Race == "beast") beasts.Add(m);
+            }
+            if (beasts.Count == 0) return;
+            Minion beast = beasts[Simulation.Rng.Next(beasts.Count)];
+            if (beast.CreatedByYogg || Simulation.Rng.Next(9) < 3)
+            {
+                beast.Effects.AttackModifier += 2;
+                // shortcut: ignoring immunity, the only time it will come into effect is when we summon huffer and it survives.
+            }
         }
         
         /// <summary>
@@ -1010,7 +1344,7 @@ namespace YoggSim
         /// </summary>
         public static void Eviscerate(Board b)
         {
-
+            b.GetRandomCharacter().ModifyHealth(-4);
         }
         
         /// <summary>
@@ -1018,7 +1352,9 @@ namespace YoggSim
         /// </summary>
         public static void ShadowBolt(Board b)
         {
-
+            Minion m = b.GetRandomMinion();
+            if (m == null) return;
+            m.ModifyHealth(-4);
         }
         
         /// <summary>
@@ -1026,7 +1362,8 @@ namespace YoggSim
         /// </summary>
         public static void DrainLife(Board b)
         {
-
+            b.GetRandomCharacter().ModifyHealth(-2);
+            b.Player.ModifyHealth(2);
         }
         
         /// <summary>
@@ -1034,7 +1371,14 @@ namespace YoggSim
         /// </summary>
         public static void Cleave(Board b)
         {
-
+            if (b.OpponentMinions.Count >= 2)
+            {
+                Minion firstMinion = b.GetRandomMinion();
+                firstMinion.ModifyHealth(-2);
+                Minion secondMinion = b.GetRandomMinion();
+                while (secondMinion == firstMinion) secondMinion = b.GetRandomMinion();
+                secondMinion.ModifyHealth(-2);
+            }
         }
         
         /// <summary>
@@ -1042,7 +1386,10 @@ namespace YoggSim
         /// </summary>
         public static void BlessingofKings(Board b)
         {
-
+            Minion m = b.GetRandomMinion();
+            if (m == null) return;
+            m.Effects.AttackModifier += 4;
+            m.Effects.HealthModifier += 4;
         }
         
         /// <summary>
@@ -1050,7 +1397,16 @@ namespace YoggSim
         /// </summary>
         public static void Hellfire(Board b)
         {
-
+            b.Player.ModifyHealth(-3);
+            b.Opponent.ModifyHealth(-3);
+            foreach (Minion m in b.PlayerMinions)
+            {
+                m.ModifyHealth(-3);
+            }
+            foreach (Minion m in b.OpponentMinions)
+            {
+                m.ModifyHealth(-3);
+            }
         }
         
         /// <summary>
@@ -1058,7 +1414,9 @@ namespace YoggSim
         /// </summary>
         public static void FrostShock(Board b)
         {
-
+            Character c = b.GetRandomOpponent();
+            c.ModifyHealth(-1);
+            c.Frozen = true;
         }
         
         /// <summary>
@@ -1066,7 +1424,8 @@ namespace YoggSim
         /// </summary>
         public static void Soulfire(Board b)
         {
-
+            b.GetRandomCharacter().ModifyHealth(-4);
+            b.Player.Draw(-1);
         }
         
         /// <summary>
@@ -1074,7 +1433,9 @@ namespace YoggSim
         /// </summary>
         public static void Corruption(Board b)
         {
-
+            Minion m = b.GetRandomOpponentMinion();
+            if (m == null) return;
+            m.Effects.DestroyAtStartOfNextTurn = true;
         }
         
         /// <summary>
@@ -1082,7 +1443,10 @@ namespace YoggSim
         /// </summary>
         public static void Conceal(Board b)
         {
-
+            foreach (Minion m in b.PlayerMinions)
+            {
+                m.Effects.Stealth = true;
+            }
         }
         
         /// <summary>
@@ -1090,7 +1454,10 @@ namespace YoggSim
         /// </summary>
         public static void Flamestrike(Board b)
         {
-
+            foreach (Minion m in b.OpponentMinions)
+            {
+                m.ModifyHealth(-4);
+            }
         }
         
         /// <summary>
@@ -1098,7 +1465,7 @@ namespace YoggSim
         /// </summary>
         public static void HeroicStrike(Board b)
         {
-
+            b.Player.HeroAttackBuff += 4;
         }
         
         /// <summary>
@@ -1106,7 +1473,8 @@ namespace YoggSim
         /// </summary>
         public static void ShieldBlock(Board b)
         {
-
+            b.Player.Armour += 5;
+            b.Player.Draw(1);
         }
         
         /// <summary>
@@ -1114,7 +1482,10 @@ namespace YoggSim
         /// </summary>
         public static void CommandingShout(Board b)
         {
-
+            foreach (Minion m in b.PlayerMinions)
+            {
+                m.Effects.CommandingShout = true;
+            }
         }
         
         /// <summary>
@@ -1122,7 +1493,7 @@ namespace YoggSim
         /// </summary>
         public static void Tracking(Board b)
         {
-
+            b.Player.Draw(1);   // shortcut: not simulating removing cards from the deck (other than drawing)
         }
         
         /// <summary>
@@ -1130,7 +1501,8 @@ namespace YoggSim
         /// </summary>
         public static void Claw(Board b)
         {
-
+            b.Player.HeroAttackBuff += 2;
+            b.Player.Armour += 2;
         }
         
         /// <summary>
@@ -1138,7 +1510,7 @@ namespace YoggSim
         /// </summary>
         public static void BladeFlurry(Board b)
         {
-
+            // shortcut: not dealing with weapons yet.
         }
         
         /// <summary>
@@ -1146,7 +1518,10 @@ namespace YoggSim
         /// </summary>
         public static void Slam(Board b)
         {
-
+            Minion m = b.GetRandomMinion();
+            if (m == null) return;
+            m.ModifyHealth(-2);
+            if (m.ActualHealth > 0) b.Player.Draw(1);
         }
         
         /// <summary>
@@ -1154,7 +1529,10 @@ namespace YoggSim
         /// </summary>
         public static void MirrorImage(Board b)
         {
-
+            for (int i = 0; i < 2 && b.PlayerMinions.Count < 7; i++)
+            {
+                b.PlayerMinions.Add(new Minion("Mirror Image", 0, 2, 1, Simulation.TauntManaValue));
+            }
         }
         
         /// <summary>
@@ -1162,7 +1540,7 @@ namespace YoggSim
         /// </summary>
         public static void Pyroblast(Board b)
         {
-
+            b.GetRandomCharacter().ModifyHealth(-10);
         }
         
         /// <summary>
@@ -1170,7 +1548,7 @@ namespace YoggSim
         /// </summary>
         public static void Misdirection(Board b)
         {
-
+            b.Player.AddSecretValue(Simulation.HunterSecretManaValue);
         }
         
         /// <summary>
@@ -1178,7 +1556,10 @@ namespace YoggSim
         /// </summary>
         public static void MortalCoil(Board b)
         {
-
+            Minion m = b.GetRandomMinion();
+            if (m == null) return;
+            m.ModifyHealth(-1);
+            if (m.ActualHealth <= 0) b.Player.Draw(1);
         }
         
         /// <summary>
@@ -1186,7 +1567,9 @@ namespace YoggSim
         /// </summary>
         public static void DeadlyShot(Board b)
         {
-
+            Minion m = b.GetRandomOpponentMinion();
+            if (m == null) return;
+            b.OpponentMinions.Remove(m);
         }
         
         /// <summary>
@@ -1194,7 +1577,7 @@ namespace YoggSim
         /// </summary>
         public static void MindVision(Board b)
         {
-
+            b.Player.AddCards(1);
         }
         
         /// <summary>
@@ -1202,7 +1585,20 @@ namespace YoggSim
         /// </summary>
         public static void SiphonSoul(Board b)
         {
-
+            Minion m = b.GetRandomMinion();
+            if (b.PlayerMinions.Contains(m))
+            {
+                b.PlayerMinions.Remove(m);
+            }
+            else if (b.OpponentMinions.Contains(m))
+            {
+                b.OpponentMinions.Remove(m);
+            }
+            else
+            {
+                throw new Exception("Found a minion that's not on the board.");
+            }
+            b.Player.ModifyHealth(3);
         }
         
         /// <summary>
@@ -1210,7 +1606,27 @@ namespace YoggSim
         /// </summary>
         public static void Rampage(Board b)
         {
-
+            List<Minion> damagedMinions = new List<Minion>();
+            foreach (Minion m in b.OpponentMinions)
+            {
+                if (m.Damage > 0)
+                {
+                    damagedMinions.Add(m);
+                }
+            }
+            foreach (Minion m in b.PlayerMinions)
+            {
+                if (m.Damage > 0)
+                {
+                    damagedMinions.Add(m);
+                }
+            }
+            if (damagedMinions.Count > 0)
+            {
+                Minion m = damagedMinions[Simulation.Rng.Next(damagedMinions.Count)];
+                m.Effects.AttackModifier += 3;
+                m.Effects.HealthModifier += 3;
+            }
         }
         
         /// <summary>
@@ -1218,7 +1634,8 @@ namespace YoggSim
         /// </summary>
         public static void WildGrowth(Board b)
         {
-
+            // shorcut: probably at 10 mana... you could argue that this should be AddCards() instead of Draw()
+            b.Player.Draw(1);
         }
         
         /// <summary>
@@ -1226,7 +1643,18 @@ namespace YoggSim
         /// </summary>
         public static void Demonfire(Board b)
         {
-
+            Minion m = b.GetRandomMinion();
+            if (m == null) return;
+            if (m.Race == "demon" && m.CreatedByYogg)
+            {
+                // shortcut: assuming that the player didn't have demons on board before Yogging.
+                m.Effects.AttackModifier += 2;
+                m.Effects.HealthModifier += 2;
+            }
+            else
+            {
+                m.ModifyHealth(-2);
+            }
         }
         
         /// <summary>
@@ -1234,7 +1662,8 @@ namespace YoggSim
         /// </summary>
         public static void Preparation(Board b)
         {
-
+            // no guarantee that the player will have a useful spell that they can play after this.
+            b.Player.OtherEffectManaValue += 3 * Simulation.CardDiscountManaModifier;
         }
         
         /// <summary>
@@ -1242,7 +1671,8 @@ namespace YoggSim
         /// </summary>
         public static void Bloodlust(Board b)
         {
-
+            // shortcut: assuming that minions have already attacked and negligible expected value from summoning 
+            // a minion with charge
         }
         
         /// <summary>
@@ -1250,7 +1680,10 @@ namespace YoggSim
         /// </summary>
         public static void AvengingWrath(Board b)
         {
-
+            for (int i = 0; i < 8; i++)
+            {
+                b.GetRandomCharacter().ModifyHealth(-1);
+            }
         }
         
         /// <summary>
@@ -1258,7 +1691,9 @@ namespace YoggSim
         /// </summary>
         public static void Silence(Board b)
         {
-
+            Minion m = b.GetRandomMinion();
+            if (m == null) return;
+            m.Silence();
         }
         
         /// <summary>
@@ -1266,7 +1701,10 @@ namespace YoggSim
         /// </summary>
         public static void UnleashtheHounds(Board b)
         {
-
+            for (int i = 0; i < b.OpponentMinions.Count && b.PlayerMinions.Count < 7; i++)
+            {
+                b.PlayerMinions.Add(new Minion("Hound", 1, 1, 0, 1 * Simulation.ChargeManaModifier));
+            }
         }
         
         /// <summary>
@@ -1274,7 +1712,9 @@ namespace YoggSim
         /// </summary>
         public static void DivineSpirit(Board b)
         {
-
+            Minion m = b.GetRandomMinion();
+            if (m == null) return;
+            m.Effects.HealthModifier = 2 * m.ActualHealth;
         }
         
         /// <summary>
@@ -1282,7 +1722,14 @@ namespace YoggSim
         /// </summary>
         public static void CircleofHealing(Board b)
         {
-
+            foreach (Minion m in b.PlayerMinions)
+            {
+                m.ModifyHealth(4);
+            }
+            foreach (Minion m in b.OpponentMinions)
+            {
+                m.ModifyHealth(4);
+            }
         }
         
         /// <summary>
@@ -1290,7 +1737,25 @@ namespace YoggSim
         /// </summary>
         public static void ShadowWordDeath(Board b)
         {
-
+            List<Minion> eligibleMinions = new List<Minion>();
+            foreach (Minion m in b.PlayerMinions)
+            {
+                if (m.ActualAttack >= 5)
+                {
+                    eligibleMinions.Add(m);
+                }
+            }
+            foreach (Minion m in b.OpponentMinions)
+            {
+                if (m.ActualAttack >= 5)
+                {
+                    eligibleMinions.Add(m);
+                }
+            }
+            if (eligibleMinions.Count == 0) return;
+            Minion minionToKill = eligibleMinions[Simulation.Rng.Next(eligibleMinions.Count)];
+            b.PlayerMinions.Remove(minionToKill);
+            b.OpponentMinions.Remove(minionToKill);
         }
         
         /// <summary>
@@ -1298,7 +1763,13 @@ namespace YoggSim
         /// </summary>
         public static void HolyFire(Board b)
         {
-
+            b.GetRandomCharacter().ModifyHealth(-5);
+            if (b.Player.ActualHealth <= 0)
+            {
+                // player died
+                return;
+            }
+            b.Player.ModifyHealth(5);
         }
         
         /// <summary>
@@ -1306,7 +1777,11 @@ namespace YoggSim
         /// </summary>
         public static void MassDispel(Board b)
         {
-
+            foreach (Minion m in b.OpponentMinions)
+            {
+                m.Silence();
+            }
+            b.Player.Draw(1);
         }
         
         /// <summary>
@@ -1314,7 +1789,25 @@ namespace YoggSim
         /// </summary>
         public static void ShadowWordPain(Board b)
         {
-
+            List<Minion> eligibleMinions = new List<Minion>();
+            foreach (Minion m in b.PlayerMinions)
+            {
+                if (m.ActualAttack <= 3)
+                {
+                    eligibleMinions.Add(m);
+                }
+            }
+            foreach (Minion m in b.OpponentMinions)
+            {
+                if (m.ActualAttack <= 3)
+                {
+                    eligibleMinions.Add(m);
+                }
+            }
+            if (eligibleMinions.Count == 0) return;
+            Minion minionToKill = eligibleMinions[Simulation.Rng.Next(eligibleMinions.Count)];
+            b.PlayerMinions.Remove(minionToKill);
+            b.OpponentMinions.Remove(minionToKill);
         }
         
         /// <summary>
@@ -1322,7 +1815,8 @@ namespace YoggSim
         /// </summary>
         public static void Shadowform(Board b)
         {
-
+            // ???
+            b.Player.OtherEffectManaValue += 1;
         }
         
         /// <summary>
@@ -1330,7 +1824,17 @@ namespace YoggSim
         /// </summary>
         public static void BlessingofWisdom(Board b)
         {
-
+            Minion m = b.GetRandomMinion();
+            if (m == null) return;
+            if (b.PlayerMinions.Contains(m))
+            {
+                m.Effects.OtherEffectValue += 1;
+            }
+            else
+            {
+                // subtracting value from the opponent adds it to the player!
+                m.Effects.OtherEffectValue -= 1;
+            }
         }
         
         /// <summary>
@@ -1338,7 +1842,9 @@ namespace YoggSim
         /// </summary>
         public static void BlessedChampion(Board b)
         {
-
+            Minion m = b.GetRandomMinion();
+            if (m == null) return;
+            m.Effects.AttackModifier = m.ActualAttack * 2 - m.Attack;
         }
         
         /// <summary>
@@ -1346,7 +1852,7 @@ namespace YoggSim
         /// </summary>
         public static void SolemnVigil(Board b)
         {
-
+            b.Player.Draw(2);
         }
         
         /// <summary>
@@ -1354,7 +1860,7 @@ namespace YoggSim
         /// </summary>
         public static void DragonsBreath(Board b)
         {
-
+            b.GetRandomCharacter().ModifyHealth(-4);
         }
         
         /// <summary>
@@ -1362,7 +1868,14 @@ namespace YoggSim
         /// </summary>
         public static void Demonwrath(Board b)
         {
-
+            foreach (Minion m in b.OpponentMinions)
+            {
+                if (m.Race != "demon" || (!m.CreatedByYogg && Simulation.Rng.Next(9) != 0))
+                {
+                    // This should be true most of the time, and we're removing some minions that are incorrectly identified by demons
+                    m.ModifyHealth(-2);
+                }
+            }
         }
         
         /// <summary>
@@ -1370,7 +1883,8 @@ namespace YoggSim
         /// </summary>
         public static void GangUp(Board b)
         {
-
+            // shortcut: not really sure how to account for the value added here; will probably just ignore it.
+            b.Player.CardsAddedToDeck += 3;
         }
         
         /// <summary>
@@ -1378,7 +1892,8 @@ namespace YoggSim
         /// </summary>
         public static void LavaShock(Board b)
         {
-
+            // no value in unlocking overloaded crystals unless Ben Brode gets his way.
+            b.GetRandomCharacter().ModifyHealth(-2);
         }
         
         /// <summary>
@@ -1386,7 +1901,11 @@ namespace YoggSim
         /// </summary>
         public static void QuickShot(Board b)
         {
-
+            b.GetRandomCharacter().ModifyHealth(-3);
+            if (b.Player.HandSize == 0)
+            {
+                b.Player.Draw(1);
+            }
         }
         
         /// <summary>
@@ -1394,7 +1913,14 @@ namespace YoggSim
         /// </summary>
         public static void Revenge(Board b)
         {
-
+            foreach (Minion m in b.PlayerMinions)
+            {
+                m.ModifyHealth(b.Player.ActualHealth > 12 ? -1 : -3);
+            }
+            foreach (Minion m in b.OpponentMinions)
+            {
+                m.ModifyHealth(b.Player.ActualHealth > 12 ? -1 : -3);
+            }
         }
         
         /// <summary>
@@ -1402,7 +1928,11 @@ namespace YoggSim
         /// </summary>
         public static void Resurrect(Board b)
         {
-
+            // shortcut: just putting a random minion into the battlefield
+            if (b.PlayerMinions.Count < 7)
+            {
+                b.PlayerMinions.Add(CardFactory.GetRandomMinion());
+            }
         }
         
         /// <summary>
@@ -1410,7 +1940,11 @@ namespace YoggSim
         /// </summary>
         public static void EveryfinisAwesome(Board b)
         {
-
+            foreach (Minion m in b.PlayerMinions)
+            {
+                m.Effects.AttackModifier += 2;
+                m.Effects.HealthModifier += 2;
+            }
         }
         
         /// <summary>
@@ -1418,7 +1952,11 @@ namespace YoggSim
         /// </summary>
         public static void ExplorersHat(Board b)
         {
-
+            Minion m = b.GetRandomMinion();
+            if (m == null) return;
+            m.Effects.AttackModifier++;
+            m.Effects.HealthModifier++;
+            m.Effects.DeathrattleValue += 1.0;  // man, I dunno
         }
         
         /// <summary>
@@ -1426,7 +1964,7 @@ namespace YoggSim
         /// </summary>
         public static void RavenIdol(Board b)
         {
-
+            b.Player.AddCards(1);
         }
         
         /// <summary>
@@ -1434,7 +1972,7 @@ namespace YoggSim
         /// </summary>
         public static void DartTrap(Board b)
         {
-
+            b.Player.AddSecretValue(Simulation.HunterSecretManaValue);
         }
         
         /// <summary>
@@ -1442,7 +1980,8 @@ namespace YoggSim
         /// </summary>
         public static void ForgottenTorch(Board b)
         {
-
+            b.GetRandomCharacter().ModifyHealth(-3);
+            b.Player.CardsAddedToDeck += 1;
         }
         
         /// <summary>
@@ -1450,7 +1989,7 @@ namespace YoggSim
         /// </summary>
         public static void AnyfinCanHappen(Board b)
         {
-
+            // yeah, I'm just gonna ignore this.
         }
         
         /// <summary>
@@ -1458,7 +1997,7 @@ namespace YoggSim
         /// </summary>
         public static void SacredTrial(Board b)
         {
-
+            b.Player.AddSecretValue(Simulation.PaladinSecretManaValue);
         }
         
         /// <summary>
@@ -1474,7 +2013,7 @@ namespace YoggSim
         /// </summary>
         public static void Entomb(Board b)
         {
-
+            
         }
         
         /// <summary>

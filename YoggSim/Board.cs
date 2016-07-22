@@ -58,6 +58,16 @@ namespace YoggSim
             return Opponent;
         }
 
+        public Character GetRandomFriendlyCharacter()
+        {
+            int characterNumber = Simulation.Rng.Next(PlayerMinions.Count + 1);
+            if (characterNumber < PlayerMinions.Count)
+            {
+                return PlayerMinions[characterNumber];
+            }
+            return Player;
+        }
+
         public Minion GetRandomFriendlyMinion()
         {
             int minionNumber = Simulation.Rng.Next(PlayerMinions.Count);
@@ -104,6 +114,11 @@ namespace YoggSim
             }
             if (validCharacters.Count == 0) return null;
             return validCharacters[Simulation.Rng.Next(validCharacters.Count)];
+        }
+
+        public Minion GetRandomOpponentMinion()
+        {
+            return OpponentMinions[Simulation.Rng.Next(OpponentMinions.Count)];
         }
 
         public Player Player { get; set; }
